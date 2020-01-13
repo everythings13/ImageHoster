@@ -1,21 +1,21 @@
 package ImageHoster.controller;
 
+import ImageHoster.model.Comment;
 import ImageHoster.model.Image;
 import ImageHoster.model.Tag;
 import ImageHoster.model.User;
+import ImageHoster.service.CommentService;
 import ImageHoster.service.ImageService;
 import ImageHoster.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
 
 @Controller
@@ -26,6 +26,9 @@ public class ImageController {
 
     @Autowired
     private TagService tagService;
+
+    @Autowired
+    private CommentService commentService;
 
     //This method displays all the images in the user home page after successful login
     @RequestMapping("images")
@@ -50,6 +53,7 @@ public class ImageController {
         Image image = imageService.getImageByIdAndTitle(imageId, title);
         model.addAttribute("image", image);
         model.addAttribute("tags", image.getTags());
+        model.addAttribute("comments", image.getComments());
         return "images/image";
     }
 
@@ -85,6 +89,20 @@ public class ImageController {
         return "redirect:/images";
     }
 
+
+    @RequestMapping(value = "/image/{imageId}/{imageTitle}/comments", method = RequestMethod.POST)
+    public String uploadAndGetComments(@PathVariable("imageId") Integer imageId, @PathVariable("imageTitle") String imageTitle, @RequestParam("comment") String comments, HttpSession session) {
+        Image image = imageService.getImage(imageId);
+        User user = (User) session.getAttribute("loggeduser");
+        Comment comment = new Comment();
+        comment.setText(comments);
+        comment.setDate(LocalDate.now());
+        comment.setUser(user);
+        comment.setImage(image);
+        commentService.uploadComments(comment);
+        return "redirect:/images/" + imageId + "/" + imageTitle;
+    }
+
     //This controller method is called when the request pattern is of type 'editImage'
     //This method fetches the image with the corresponding id from the database and adds it to the model with the key as 'image'
     //The method then returns 'images/edit.html' file wherein you fill all the updated details of the image
@@ -103,6 +121,7 @@ public class ImageController {
         }
         String error = "Only the owner of the image can edit the image";
         model.addAttribute("editError", error);
+        model.addAttribute("comments", image.getComments());
         return "images/image";
     }
 
@@ -137,7 +156,7 @@ public class ImageController {
         updatedImage.setDate(new Date());
 
         imageService.updateImage(updatedImage);
-        return "redirect:/images/" +  updatedImage.getId() + "/" + updatedImage.getTitle();
+        return "redirect:/images/" + updatedImage.getId() + "/" + updatedImage.getTitle();
     }
 
 
@@ -155,6 +174,7 @@ public class ImageController {
         model.addAttribute("image", image);
         String error = "Only the owner of the image can delete the image";
         model.addAttribute("deleteError", error);
+        model.addAttribute("comments", image.getComments());
         return "images/image";
     }
 
