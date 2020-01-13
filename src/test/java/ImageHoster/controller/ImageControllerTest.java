@@ -1,4 +1,3 @@
-/*
 package ImageHoster.controller;
 
 import ImageHoster.model.Image;
@@ -86,7 +85,7 @@ public class ImageControllerTest {
         image.setDescription("This image is for testing purpose");
         image.setUser(user);
 
-        Mockito.when(imageService.getImage(Mockito.anyInt())).thenReturn(image);
+        Mockito.when(imageService.getImageByIdAndTitle(Mockito.anyInt(), Mockito.anyString())).thenReturn(image);
 
         this.mockMvc.perform(get("/images/1/new").session(session))
                 .andExpect(view().name("images/image"))
@@ -310,4 +309,3 @@ public class ImageControllerTest {
     }
 }
 
-*/
