@@ -18,23 +18,24 @@ import java.time.LocalDate;
 @Controller
 public class CommentController {
 
-    @Autowired
-    private ImageService imageService;
+  @Autowired private ImageService imageService;
 
-    @Autowired
-    private CommentService commentService;
+  @Autowired private CommentService commentService;
 
-    @RequestMapping(value = "/image/{imageId}/{imageTitle}/comments", method = RequestMethod.POST)
-    public String uploadAndGetComments(@PathVariable("imageId") Integer imageId, @PathVariable("imageTitle") String imageTitle, @RequestParam("comment") String comments, HttpSession session) {
-        Image image = imageService.getImage(imageId);
-        User user = (User) session.getAttribute("loggeduser");
-        Comment comment = new Comment();
-        comment.setText(comments);
-        comment.setDate(LocalDate.now());
-        comment.setUser(user);
-        comment.setImage(image);
-        commentService.uploadComments(comment);
-        return "redirect:/images/" + imageId + "/" + imageTitle;
-    }
-
+  @RequestMapping(value = "/image/{imageId}/{imageTitle}/comments", method = RequestMethod.POST)
+  public String uploadAndGetComments(
+      @PathVariable("imageId") Integer imageId,
+      @PathVariable("imageTitle") String imageTitle,
+      @RequestParam("comment") String comments,
+      HttpSession session) {
+    Image image = imageService.getImage(imageId);
+    User user = (User) session.getAttribute("loggeduser");
+    Comment comment = new Comment();
+    comment.setText(comments);
+    comment.setDate(LocalDate.now());
+    comment.setUser(user);
+    comment.setImage(image);
+    commentService.uploadComments(comment);
+    return "redirect:/images/" + imageId + "/" + imageTitle;
+  }
 }

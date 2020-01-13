@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CommentService {
-    @Autowired
-    private CommentRepository commentRepository;
+  @Autowired private CommentRepository commentRepository;
 
-    //The method calls the uploadComment() method in the Repository and passes the image to be persisted in the database
-    public void uploadComments(Comment comment) {
-        commentRepository.uploadComment(comment);
-    }
+  // The method calls the uploadComment() method in the Repository and passes the image to be
+  // persisted in the database
+  public void uploadComments(Comment comment) {
+    commentRepository.uploadComment(comment);
+  }
 }
