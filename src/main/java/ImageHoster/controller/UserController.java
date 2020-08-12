@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 @Controller
@@ -43,15 +44,27 @@ public class UserController {
   @RequestMapping(value = "users/registration", method = RequestMethod.POST)
   public String registerUser(User user, Model model, RedirectAttributes redirectAttributes) {
     String password = user.getPassword();
-    if (isValidPassword(password)) {
+    boolean retypedPasswordValid = isRetypedPasswordValid(user.getRetypedPassword(), password);
+    if (isValidPassword(password) && retypedPasswordValid) {
       userService.registerUser(user);
       return "redirect:/users/login";
+    }
+    if (!retypedPasswordValid) {
+      String error = "Password does not match";
+      redirectAttributes.addAttribute("passwordError", error);
+      model.addAttribute("passwordError", error);
+      redirectAttributes.addFlashAttribute("passwordError", error);
+      return "redirect:/users/registration";
     }
     String error = "Password must contain at least 1 alphabet, 1 number & 1 special character";
     redirectAttributes.addAttribute("passwordTypeError", error);
     model.addAttribute("passwordTypeError", error);
     redirectAttributes.addFlashAttribute("passwordTypeError", error);
     return "redirect:/users/registration";
+  }
+
+  private boolean isRetypedPasswordValid(String retypedPassword, String password) {
+    return !Objects.isNull(retypedPassword) && retypedPassword.equals(password);
   }
 
   private boolean isValidPassword(String password) {
