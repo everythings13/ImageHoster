@@ -57,6 +57,7 @@ public class UserControllerTest {
     user.setId(1);
     user.setUsername("Abhi");
     user.setPassword("password");
+    user.setRetypedPassword("password");
 
     this.mockMvc
         .perform(post("/users/registration").flashAttr("user", user))
@@ -66,6 +67,33 @@ public class UserControllerTest {
                     "passwordTypeError",
                     equalTo(
                         "Password must contain at least 1 alphabet, 1 number & 1 special character")));
+  }
+
+  // This test checks the controller logic for user signup when user fills the form and send the
+  // POST request to the server but the password type is wrong and checks whether the Model type
+  // object contains the desired attribute with desired value
+  @Test
+  public void signupWithWrongRetypedPassword() throws Exception {
+    User user = new User();
+    UserProfile userProfile = new UserProfile();
+    userProfile.setId(1);
+    userProfile.setEmailAddress("a@gmail.com");
+    userProfile.setFullName("Abhi Mahajan");
+    userProfile.setMobileNumber("9876543210");
+    user.setProfile(userProfile);
+    user.setId(1);
+    user.setUsername("Abhi");
+    user.setPassword("password");
+    user.setRetypedPassword("password@");
+
+    this.mockMvc
+            .perform(post("/users/registration").flashAttr("user", user))
+            .andExpect(
+                    model()
+                            .attribute(
+                                    "passwordError",
+                                    equalTo(
+                                            "Password does not match")));
   }
 
   // This test checks the controller logic for user signup when user fills the form and send the
@@ -83,6 +111,7 @@ public class UserControllerTest {
     user.setId(1);
     user.setUsername("Abhi");
     user.setPassword("password1@");
+    user.setRetypedPassword("password1@");
 
     this.mockMvc
         .perform(post("/users/registration").flashAttr("user", user))
